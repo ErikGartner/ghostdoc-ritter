@@ -1,9 +1,9 @@
 import unittest
 
-from ritter.GemExtractor import GemExtractor
+from ritter.gemextractor import GemExtractor
+
 
 class GemExtractorTest(unittest.TestCase):
-
     def test_sentence_reg(self):
         sentences = 'Hej mitt namn är Erik, jag är 18 år. Kolla mitt fräcka hår.'
         tokens = ['erik', '18']
@@ -18,4 +18,4 @@ class GemExtractorTest(unittest.TestCase):
         artifact = {'tokens': tokens}
 
         result = GemExtractor.extract_gem(text, gem, artifact)
-        self.assertEquals({'name': 'föddes', 'result': ['18']} , result)
+        self.assertEquals({'name': 'föddes', 'result': ['18']}, result)

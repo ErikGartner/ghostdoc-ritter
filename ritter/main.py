@@ -2,7 +2,7 @@ import pika
 
 def callback(ch, method, properties, body):
     print(" [x] Received %s" % str(body, 'UTF-8'))
-    ch.basic_ack(delivery_tag = method.delivery_tag)
+    ch.basic_ack(delivery_tag=method.delivery_tag)
 
 def start():
     connection = pika.BlockingConnection(pika.ConnectionParameters(

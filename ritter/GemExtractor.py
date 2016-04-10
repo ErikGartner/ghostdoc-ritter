@@ -1,7 +1,7 @@
 import re
 
-class GemExtractor:
 
+class GemExtractor:
     def sentence_reg(tokens):
         reg = '([^.?!]*(?:' + '|'.join(tokens) + ')[^.?!]*)'
         return re.compile(reg, re.IGNORECASE)
