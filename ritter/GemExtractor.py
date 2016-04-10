@@ -11,7 +11,7 @@ class GemExtractor:
 
     def extract_gem(text, gem, artifact):
         results = []
-        if gem == None:
+        if gem is None:
             return None
 
         reg_sentences = GemExtractor.sentence_reg(artifact['tokens'])
