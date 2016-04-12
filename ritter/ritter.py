@@ -36,9 +36,9 @@ class Ritter:
 
     def read_config(self):
         config = {
-            'mongo_uri':
+            'MONGO_URL':
             os.getenv('mongo_uri', 'mongodb://localhost:3001/meteor'),
-            'rabbit_uri':
+            'RABBITMQ_URL':
             os.getenv('rabbit_uri', 'amqp://guest:guest@localhost:5672')
         }
         return config
