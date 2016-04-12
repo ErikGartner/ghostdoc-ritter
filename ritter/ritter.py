@@ -15,8 +15,7 @@ class Ritter:
         client = MongoClient(config['mongo_uri'])
         self.database = client.get_default_database()
 
-        connection = pika.BlockingConnection(pika.ConnectionParameters(
-            'localhost'))
+        connection = pika.BlockingConnection(pika.URLParameters(config['rabbit_uri']))
         channel = connection.channel()
         channel.queue_declare(queue='ghostdoc-ritter', durable=True)
         channel.basic_consume(self.mq_callback, queue='ghostdoc-ritter')
@@ -38,6 +37,8 @@ class Ritter:
     def read_config(self):
         config = {
             'mongo_uri':
-            os.getenv('mongo_uri', 'mongodb://localhost:3001/meteor')
+            os.getenv('mongo_uri', 'mongodb://localhost:3001/meteor'),
+            'rabbit_uri':
+            os.getenv('rabbit_uri', 'amqp://guest:guest@localhost:5672')
         }
         return config
