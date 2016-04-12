@@ -1,6 +1,6 @@
 import unittest
 
-from ritter.gemextractor import GemExtractor
+from ritter.analytics.gemextractor import GemExtractor
 
 
 class GemExtractorTest(unittest.TestCase):

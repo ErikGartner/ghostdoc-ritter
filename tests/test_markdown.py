@@ -1,12 +1,11 @@
 import unittest
 
-from ritter.markdown import MarkdownMixin
+from ritter.dataprocessors.markdown import Markdown
 
 
-class MarkdownMixinTest(unittest.TestCase):
+class MarkdownTest(unittest.TestCase):
 
     def test_to_text(self):
         doc = '# Title'
-        mdm = MarkdownMixin()
-        text = mdm.markdown_to_text(doc)
+        text = Markdown.markdown_to_text(doc)
         self.assertEquals('Title', text)

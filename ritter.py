@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
-import ritter
+from ritter.ritter import Ritter
 
+ritter = Ritter()
 ritter.start()
