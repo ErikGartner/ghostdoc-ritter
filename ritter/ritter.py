@@ -5,6 +5,7 @@ import pika
 from pymongo import MongoClient
 
 from .artifact_analyzer import ArtifactAnalyzer
+from .source_analyzer import SourceAnalyzer
 
 
 class Ritter:
@@ -27,8 +28,11 @@ class Ritter:
         data = json.loads(msg)
 
         if data['type'] == 'artifact_analyzer':
-            artifact_analyzer = ArtifactAnalyzer(self.database, data['data'])
-            artifact_analyzer.analyze()
+            analyzer = ArtifactAnalyzer(self.database, data['data'])
+            analyzer.analyze()
+        if data['type'] == 'source_analyzer':
+            analyzer = SourceAnalyzer(self.database, data['data'])
+            analyzer.analyze()
         else:
             print('Unknown command type: %s' % data['type'])
 
