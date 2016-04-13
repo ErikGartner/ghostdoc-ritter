@@ -7,5 +7,5 @@ class MarkdownTest(unittest.TestCase):
 
     def test_to_text(self):
         doc = '# Title'
-        text = Markdown.markdown_to_text(doc)
+        text = Markdown.markdown_to_plaintext(doc)
         self.assertEquals('Title', text)
