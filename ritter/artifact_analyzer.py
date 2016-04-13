@@ -19,7 +19,7 @@ class ArtifactAnalyzer(AnalyzerBase):
         data = {}
         data.update(self._determine_gender(artifact))
 
-        self._save_analytics(self.collection, data, artifact.project)
+        self._save_analytics(self.collection, data, artifact['project'])
         print('ArtifactAnalyzer done with %s' % artifact['name'])
 
     def _determine_gender(self, artifact):
