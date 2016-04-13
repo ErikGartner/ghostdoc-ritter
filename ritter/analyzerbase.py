@@ -7,12 +7,13 @@ class AnalyzerBase:
         collection = self.db[collection]
         return collection.find_one({'_id': _id})
 
-    def _save_analytics(self, collection, data):
+    def _save_analytics(self, collection, data, project):
         collection = self.db['ritterData']
         collection.remove({'id': self.ritter_id()})
         doc = {
             'id': self.ritter_id(),
             'type': self.ritter_type,
-            'data': data
+            'data': data,
+            'project': project
         }
         return collection.insert_one(doc)

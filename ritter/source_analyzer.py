@@ -17,5 +17,5 @@ class SourceAnalyzer(AnalyzerBase):
 
         data = {}
 
-        self._save_analytics(self.collection, data)
+        self._save_analytics(self.collection, data, text.project)
         print('SourceAnalyzer done with %s' % text['name'])
