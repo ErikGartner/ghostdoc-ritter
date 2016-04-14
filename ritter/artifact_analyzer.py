@@ -1,9 +1,12 @@
 import json
+import itertools
 
 from .analyzerbase import AnalyzerBase
 from .analytics.genderize import Genderize
 from .dataprocessors.artifact_extractor import ArtifactExtractor
 from .dataprocessors.toc_generator import TocGenerator
+from .dataprocessors.markdown import Markdown
+from .dataprocessors.gem_extractor import GemExtractor
 
 
 class ArtifactAnalyzer(AnalyzerBase):
@@ -23,6 +26,7 @@ class ArtifactAnalyzer(AnalyzerBase):
         data.update(self._extract_text(artifact))
         data.update(self._determine_gender(artifact))
         data.update(self._generate_toc(data))
+        data.update(self._extract_gems(artifact, data))
 
         self._save_analytics(self.collection, data, artifact['project'])
 
@@ -56,4 +60,21 @@ class ArtifactAnalyzer(AnalyzerBase):
             toc.extend(TocGenerator.generate_toc(marked_tree))
 
         data = {'toc': {'data': TocGenerator.generate_toc(marked_tree)}}
+        return data
+
+    def _extract_gems(self, artifact, data):
+        print(' => Extracting gems')
+        if 'marked_tree' not in data:
+            print('\t\t - Error missing marked_tree data')
+            return {}
+
+        tree = []
+        for d in data['marked_tree']['data']:
+            tree.extend(d['tree'])
+        plaintext = Markdown.tree_to_plaintext(tree)
+
+        gems = iter(self.db['gems'].find({'project': artifact['project']}))
+        gem_data = GemExtractor.extract(plaintext, artifact, gems)
+
+        data = {'gems': {'data': gem_data}}
         return data
