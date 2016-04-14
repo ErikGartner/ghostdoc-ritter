@@ -1,5 +1,4 @@
 import json
-import itertools
 
 from .analyzerbase import AnalyzerBase
 from .analytics.genderize import Genderize
@@ -7,6 +6,7 @@ from .dataprocessors.artifact_extractor import ArtifactExtractor
 from .dataprocessors.toc_generator import TocGenerator
 from .dataprocessors.markdown import Markdown
 from .dataprocessors.gem_extractor import GemExtractor
+from .dataprocessors.annotators import ArtifactAnnotator
 
 
 class ArtifactAnalyzer(AnalyzerBase):
@@ -27,6 +27,7 @@ class ArtifactAnalyzer(AnalyzerBase):
         data.update(self._determine_gender(artifact))
         data.update(self._generate_toc(data))
         data.update(self._extract_gems(artifact, data))
+        data.update(self._linkify_artifacts(artifact, data))
 
         self._save_analytics(self.collection, data, artifact['project'])
 
@@ -77,3 +78,19 @@ class ArtifactAnalyzer(AnalyzerBase):
 
         data = {'gems': {'data': gem_data}}
         return data
+
+    def _linkify_artifacts(self, artifact, data):
+        print(' => Linkifying artifacts')
+        if 'marked_tree' not in data:
+            print('\t\t - Error missing marked_tree data')
+            return {}
+
+        artifacts = self.db['artifacts'].find({'project': artifact['project']})
+        artifacts = iter(artifacts)
+
+        marked_tree = []
+        for item in data['marked_tree']['data']:
+            marked_tree.extend(item['tree'])
+
+        ArtifactAnnotator.linkify_artifacts(marked_tree, artifacts)
+        return {}
