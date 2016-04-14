@@ -35,7 +35,7 @@ class Ritter:
         if data['type'] == 'artifact_analyzer':
             analyzer = ArtifactAnalyzer(self.database, data['data'])
             analyzer.analyze()
-        if data['type'] == 'source_analyzer':
+        elif data['type'] == 'source_analyzer':
             analyzer = SourceAnalyzer(self.database, data['data'])
             analyzer.analyze()
         else:
