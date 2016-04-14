@@ -3,6 +3,7 @@ import json
 from .analyzerbase import AnalyzerBase
 from .analytics.genderize import Genderize
 from .dataprocessors.artifact_extractor import ArtifactExtractor
+from .dataprocessors.toc_generator import TocGenerator
 
 
 class ArtifactAnalyzer(AnalyzerBase):
@@ -22,6 +23,7 @@ class ArtifactAnalyzer(AnalyzerBase):
         data = {}
         data.update(self._extract_text(artifact))
         data.update(self._determine_gender(artifact))
+        data.update(self._generate_toc(data))
 
         self._save_analytics(self.collection, data, artifact['project'])
         print('\t ArtifactAnalyzer done with %s' % artifact['name'])
@@ -43,3 +45,17 @@ class ArtifactAnalyzer(AnalyzerBase):
             if len(tree) > 0:
                 data.append({'source': source['_id'], 'tree': tree})
         return {'marked_tree': {'data': data}}
+
+    def _generate_toc(self, data):
+        print('\t => Generating table of content')
+        if 'marked_tree' not in data:
+            print('\t\t - Error missing marked_tree data')
+            return {}
+
+        toc = []
+        for d in data['marked_tree']['data']:
+            marked_tree = d['tree']
+            toc.extend(TocGenerator.generate_toc(marked_tree))
+
+        data = {'toc': {'data': TocGenerator.generate_toc(marked_tree)}}
+        return data
