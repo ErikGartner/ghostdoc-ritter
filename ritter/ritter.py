@@ -32,18 +32,24 @@ class Ritter:
         data = json.loads(msg)
 
         start_time = time.perf_counter()
-        if data['type'] == 'artifact_analyzer':
-            analyzer = ArtifactAnalyzer(self.database, data['data'])
-            analyzer.analyze()
-        elif data['type'] == 'source_analyzer':
-            analyzer = SourceAnalyzer(self.database, data['data'])
-            analyzer.analyze()
-        else:
-            print('Unknown command type: %s' % data['type'])
-        print('[x] Processed cmd in %ss\n' %
-              (time.perf_counter() - start_time))
 
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+        try:
+            if data['type'] == 'artifact_analyzer':
+                analyzer = ArtifactAnalyzer(self.database, data['data'])
+                analyzer.analyze()
+            elif data['type'] == 'source_analyzer':
+                analyzer = SourceAnalyzer(self.database, data['data'])
+                analyzer.analyze()
+            else:
+                print('Unknown command type: %s' % data['type'])
+
+        except Exception as e:
+            print('[e] Failed to process (%s)\n' % e)
+        else:
+            print('[x] Processed cmd in %ss\n' %
+                  (time.perf_counter() - start_time))
+        finally:
+            ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def read_config(self):
         config = {
