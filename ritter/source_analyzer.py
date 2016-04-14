@@ -13,10 +13,9 @@ class SourceAnalyzer(AnalyzerBase):
         self.collection = 'texts'
 
     def analyze(self):
-        print('\t Running SourceAnalyzer')
         text = self._get_doc(self.collection, self.id)
         if text is None:
-            print('Text not found %s' % self.id)
+            print(' => Text not found %s' % self.id)
             return
 
         marked_tree = json.loads(text['markedTree'])
@@ -24,10 +23,9 @@ class SourceAnalyzer(AnalyzerBase):
         data = {}
         data.update(self._generate_toc(marked_tree))
         self._save_analytics(self.collection, data, text['project'])
-        print('\t SourceAnalyzer done with %s' % text['name'])
 
     def _generate_toc(self, marked_tree):
-        print('\t => Generating table of content')
+        print(' => Generating table of content')
         data = {
             'toc': TocGenerator.generate_toc(marked_tree)
         }
