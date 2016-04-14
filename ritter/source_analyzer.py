@@ -2,6 +2,7 @@ import json
 
 from .analyzerbase import AnalyzerBase
 from .dataprocessors.toc_generator import TocGenerator
+from .dataprocessors.annotators import ArtifactAnnotator
 
 
 class SourceAnalyzer(AnalyzerBase):
@@ -22,6 +23,8 @@ class SourceAnalyzer(AnalyzerBase):
 
         data = {}
         data.update(self._generate_toc(marked_tree))
+        data.update(self._linkify_artifacts(marked_tree, text))
+
         self._save_analytics(self.collection, data, text['project'])
 
     def _generate_toc(self, marked_tree):
@@ -30,3 +33,12 @@ class SourceAnalyzer(AnalyzerBase):
             'toc': TocGenerator.generate_toc(marked_tree)
         }
         return data
+
+    def _linkify_artifacts(self, marked_tree, text):
+        print(' => Linkifying artifacts')
+
+        artifacts = self.db['artifacts'].find({'project': text['project']})
+        artifacts = iter(artifacts)
+
+        ArtifactAnnotator.linkify_artifacts(marked_tree, artifacts)
+        return {'marked_tree': {'data': marked_tree}}
