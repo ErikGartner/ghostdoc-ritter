@@ -1,5 +1,6 @@
 import os
 import json
+import time
 
 import pika
 from pymongo import MongoClient
@@ -16,17 +17,21 @@ class Ritter:
         client = MongoClient(config['mongo_uri'])
         self.database = client.get_default_database()
 
-        connection = pika.BlockingConnection(pika.URLParameters(config['rabbit_uri']))
+        connection = pika.BlockingConnection(pika.URLParameters(config[
+            'rabbit_uri']))
         channel = connection.channel()
-        channel.queue_declare(queue='ghostdoc-ritter', durable=True)
+        channel.queue_declare(queue='ghostdoc-ritter',
+                              durable=True,
+                              arguments={'x-max-priority': 10})
         channel.basic_consume(self.mq_callback, queue='ghostdoc-ritter')
         channel.start_consuming()
 
     def mq_callback(self, ch, method, properties, body):
         msg = str(body, 'UTF-8')
-        print(" [x] Received %s" % msg)
+        print("[ ] Received %s" % msg)
         data = json.loads(msg)
 
+        start_time = time.perf_counter()
         if data['type'] == 'artifact_analyzer':
             analyzer = ArtifactAnalyzer(self.database, data['data'])
             analyzer.analyze()
@@ -35,6 +40,8 @@ class Ritter:
             analyzer.analyze()
         else:
             print('Unknown command type: %s' % data['type'])
+        print('[x] Processed cmd in %ss\n' %
+              (time.perf_counter() - start_time))
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
