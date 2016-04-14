@@ -25,5 +25,5 @@ class ArtifactAnalyzer(AnalyzerBase):
     def _determine_gender(self, artifact):
         full_name = artifact['name']
         firstname = full_name.split()[0]
-        (gender, probability) = Genderize.guess_from_name(firstname)
+        gender = Genderize.guess_from_name(firstname)
         return {'genderize': {'gender': gender}}
