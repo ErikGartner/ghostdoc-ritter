@@ -71,10 +71,9 @@ class ArtifactAnalyzer(AnalyzerBase):
         tree = []
         for d in data['marked_tree']['data']:
             tree.extend(d['tree'])
-        plaintext = Markdown.tree_to_plaintext(tree)
 
         gems = iter(self.db['gems'].find({'project': artifact['project']}))
-        gem_data = GemExtractor.extract(plaintext, artifact, gems)
+        gem_data = GemExtractor.extract(tree, artifact, gems)
 
         data = {'gems': {'data': gem_data}}
         return data

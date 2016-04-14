@@ -3,17 +3,18 @@ import re
 
 class GemExtractor:
 
-    def extract(text, artifact, gems):
-        data = []
+    def extract(tree, artifact, gems):
+        sentences = []
+        for item in tree:
+            if 'text' in item:
+                sentences.append(item['text'])
 
-        reg_sentences = GemExtractor._sentence_reg(artifact['tokens'])
-        sentences = reg_sentences.findall(text)
         if len(sentences) == 0:
-            return data
+            return []
 
+        data = []
         for gem in gems:
-            gem_data = GemExtractor.extract_gem(sentences, gem, artifact)
-            data.append(gem_data)
+            data.append(GemExtractor.extract_gem(sentences, gem, artifact))
 
         return data
 
@@ -33,10 +34,6 @@ class GemExtractor:
             return {'name': gem['name'], 'result': results}
         else:
             return None
-
-    def _sentence_reg(tokens):
-        reg = '([^.?!]*(?:' + '|'.join(tokens) + ')[^.?!]*)'
-        return re.compile(reg, re.IGNORECASE)
 
     def _capture_reg(pattern):
         return re.compile(pattern, re.IGNORECASE)
