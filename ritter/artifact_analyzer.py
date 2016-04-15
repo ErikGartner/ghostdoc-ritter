@@ -60,7 +60,7 @@ class ArtifactAnalyzer(AnalyzerBase):
             marked_tree = d['tree']
             toc.extend(TocGenerator.generate_toc(marked_tree))
 
-        data = {'toc': {'data': TocGenerator.generate_toc(marked_tree)}}
+        data = {'toc': {'data': toc}}
         return data
 
     def _extract_gems(self, artifact, data):
