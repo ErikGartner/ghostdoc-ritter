@@ -23,7 +23,7 @@ class ArtifactAnnotator:
     def _marked_tree_to_big_string(marked_tree):
         strings = []
         for item in marked_tree:
-            if 'text' in item:
+            if 'text' in item and item['type'] == 'paragraph':
                 strings.append(item['text'])
         big_string = u'\u1394'.join(strings)
         return big_string
@@ -32,6 +32,6 @@ class ArtifactAnnotator:
         strings = big_string.split(u'\u1394')
         i = 0
         for item in marked_tree:
-            if 'text' in item:
+            if 'text' in item and item['type'] == 'paragraph':
                 item['text'] = strings[i]
                 i = i + 1
