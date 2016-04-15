@@ -6,7 +6,6 @@ from .dataprocessors.annotators import ArtifactAnnotator
 
 
 class SourceAnalyzer(AnalyzerBase):
-
     def __init__(self, db, data):
         self.db = db
         self.ritter_type = 'source_analytics'
@@ -29,9 +28,7 @@ class SourceAnalyzer(AnalyzerBase):
 
     def _generate_toc(self, marked_tree):
         print(' => Generating table of content')
-        data = {
-            'toc': TocGenerator.generate_toc(marked_tree)
-        }
+        data = {'toc': {'data': TocGenerator.generate_toc(marked_tree)}}
         return data
 
     def _linkify_artifacts(self, marked_tree, text):
