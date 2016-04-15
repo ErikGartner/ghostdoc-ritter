@@ -20,7 +20,9 @@ class GemExtractor:
 
         data = []
         for gem in gems:
-            data.append(GemExtractor.extract_gem(sentences, gem, artifact))
+            g = GemExtractor.extract_gem(sentences, gem, artifact)
+            if g is not None:
+                data.append(g)
 
         return data
 
