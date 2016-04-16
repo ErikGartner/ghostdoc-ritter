@@ -2,26 +2,35 @@ import re
 
 
 class ArtifactExtractor:
-
     def extract(marked_tree, artifact):
         data = []
+        reg = ArtifactExtractor._paragraph_reg(artifact['tokens'])
+        marked_tree = [i
+                       for i in marked_tree
+                       if ArtifactExtractor._filter_text_items(i, reg)]
 
-        header = None
-        for item in marked_tree:
-            # preserve last header and append it later
-            if item['type'] == 'heading':
-                header = item
-
-            elif item['type'] == 'paragraph':
-                reg = ArtifactExtractor._paragraph_reg(artifact['tokens'])
-                if reg.search(item['text']) is not None:
-                    if header is not None:
-                        data.append(header)
-                        header = None
-                    data.append(item)
-
-        return data
+        marked_tree = ArtifactExtractor._filter_headers(marked_tree)
+        return marked_tree
 
     def _paragraph_reg(tokens):
         reg = r'(\b' + r'|\b'.join(tokens) + r')'
         return re.compile(reg, re.IGNORECASE)
+
+    def _filter_text_items(item, reg):
+        if 'text' in item and item['type'] != 'heading':
+            return reg.search(item['text']) is not None
+        elif item['type'] == 'space':
+            return False
+        else:
+            return True
+
+    def _filter_headers(mt):
+        for i in range(len(mt) - 1):
+            if mt[i] is None:
+                continue
+            if mt[i]['type'] == mt[i + 1]['type'] == 'heading':
+                mt[i] = None
+            elif mt[i]['type'] == 'list_item_start' and mt[i + 1]['type'] == 'list_item_end':
+                mt[i] = None
+                mt[i + 1] = None
+        return [i for i in mt if i != None]

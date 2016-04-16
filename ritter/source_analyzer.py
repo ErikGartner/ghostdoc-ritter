@@ -5,6 +5,7 @@ from .dataprocessors.toc_generator import TocGenerator
 from .dataprocessors.annotators import ArtifactAnnotator
 from .analytics.lang_detector import LangDetector
 
+
 class SourceAnalyzer(AnalyzerBase):
     def __init__(self, db, data):
         self.db = db

@@ -2,7 +2,6 @@ import re
 
 
 class ArtifactAnnotator:
-
     def linkify_artifacts(marked_tree, artifacts):
         big_string = ArtifactAnnotator._marked_tree_to_big_string(marked_tree)
 
@@ -23,7 +22,8 @@ class ArtifactAnnotator:
     def _marked_tree_to_big_string(marked_tree):
         strings = []
         for item in marked_tree:
-            if 'text' in item and item['type'] == 'paragraph':
+            if 'text' in item and item['type'] != 'heading' and item[
+                    'type'] != 'code':
                 strings.append(item['text'])
         big_string = u'\u1394'.join(strings)
         return big_string
@@ -32,6 +32,7 @@ class ArtifactAnnotator:
         strings = big_string.split(u'\u1394')
         i = 0
         for item in marked_tree:
-            if 'text' in item and item['type'] == 'paragraph':
+            if 'text' in item and item['type'] != 'heading' and item[
+                    'type'] != 'code':
                 item['text'] = strings[i]
                 i = i + 1
