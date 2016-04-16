@@ -4,7 +4,7 @@
 
 *Ritter is the data processing engine for ghostdoc.*
 
-[Ghostdoc] is a semi-automatic self-generating wiki written in Meteor. To allow for more advanced data processing and NLP it is powered by this module, **Ritter**.
+[Ghostdoc](https://github.com/ErikGartner/ghostdoc) is a semi-automatic self-generating wiki written in Meteor. To allow for more advanced data processing and NLP it is powered by this module, **Ritter**.
 
 ## Features
 
