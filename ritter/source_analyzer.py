@@ -3,7 +3,7 @@ import json
 from .analyzerbase import AnalyzerBase
 from .dataprocessors.toc_generator import TocGenerator
 from .dataprocessors.annotators import ArtifactAnnotator
-
+from .analytics.lang_detector import LangDetector
 
 class SourceAnalyzer(AnalyzerBase):
     def __init__(self, db, data):
@@ -23,13 +23,13 @@ class SourceAnalyzer(AnalyzerBase):
         data = {}
         data.update(self._generate_toc(marked_tree))
         data.update(self._linkify_artifacts(marked_tree, text))
+        data.update(self._detect_language(text))
 
         self._save_analytics(self.collection, data, text['project'])
 
     def _generate_toc(self, marked_tree):
         print(' => Generating table of content')
-        data = {'toc': {'data': TocGenerator.generate_toc(marked_tree)}}
-        return data
+        return {'toc': {'data': TocGenerator.generate_toc(marked_tree)}}
 
     def _linkify_artifacts(self, marked_tree, text):
         print(' => Linkifying artifacts')
@@ -39,3 +39,7 @@ class SourceAnalyzer(AnalyzerBase):
 
         ArtifactAnnotator.linkify_artifacts(marked_tree, artifacts)
         return {'marked_tree': {'data': marked_tree}}
+
+    def _detect_language(self, text):
+        print(' => Detecing language')
+        return {'lang_detector': {'lang': LangDetector.detect(text['text'])}}
