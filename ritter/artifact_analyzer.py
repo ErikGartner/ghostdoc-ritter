@@ -93,4 +93,5 @@ class ArtifactAnalyzer(AnalyzerBase):
             marked_tree.extend(item['tree'])
 
         ArtifactAnnotator.linkify_artifacts(marked_tree, artifacts)
+        data['marked_tree']['is_linkified'] = True
         return {}

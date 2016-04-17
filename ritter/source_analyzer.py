@@ -4,6 +4,7 @@ from .analyzerbase import AnalyzerBase
 from .dataprocessors.toc_generator import TocGenerator
 from .dataprocessors.annotators import ArtifactAnnotator
 from .analytics.lang_detector import LangDetector
+from .analytics.network_analyzer import NetworkAnalyzer
 
 
 class SourceAnalyzer(AnalyzerBase):
@@ -25,6 +26,9 @@ class SourceAnalyzer(AnalyzerBase):
         data.update(self._generate_toc(marked_tree))
         data.update(self._linkify_artifacts(marked_tree, text))
         data.update(self._detect_language(text))
+        pairs = NetworkAnalyzer.count_artifacts_pairs(marked_tree)
+        NetworkAnalyzer.calculate_artifacts_centrality(pairs)
+        NetworkAnalyzer.determine_communities(pairs)
 
         self._save_analytics(self.collection, data, text['project'])
 
@@ -39,7 +43,7 @@ class SourceAnalyzer(AnalyzerBase):
         artifacts = iter(artifacts)
 
         ArtifactAnnotator.linkify_artifacts(marked_tree, artifacts)
-        return {'marked_tree': {'data': marked_tree}}
+        return {'marked_tree': {'data': marked_tree, 'is_linkified': True}}
 
     def _detect_language(self, text):
         print(' => Detecing language')
