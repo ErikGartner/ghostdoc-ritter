@@ -34,6 +34,6 @@ class ArtifactAnnotator:
         strings = big_string.split(u'\u1394')
         i = 0
         for item in marked_tree:
-            if 'text' in item and item['type'] not in ArtifactAnnotator.excluded_types
+            if 'text' in item and item['type'] not in ArtifactAnnotator.excluded_types:
                 item['text'] = strings[i]
                 i = i + 1
