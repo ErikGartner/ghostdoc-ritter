@@ -75,6 +75,18 @@ setup(
     # project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/technical.html#install-requires-vs-requirements-files
-    install_requires=['pymongo', 'pika', 'markdown', 'beautifulsoup4',
-                      'requests', 'gender_guesser==0.2.0']
+    install_requires=[
+        'decorator==4.0.9',
+        'gender-guesser==0.2.0',
+        'langdetect==1.0.6',
+        'Markdown==2.6.5',
+        'networkx==1.11',
+        'nltk==3.2',
+        'numpy==1.11.0',
+        'pika==0.10.0',
+        'pymongo==3.2.1',
+        'python-louvain==0.3',
+        'requests==2.9.1',
+        'six==1.10.0',
+    ]
 )
