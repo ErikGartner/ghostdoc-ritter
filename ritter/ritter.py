@@ -32,17 +32,17 @@ class Ritter:
         data = json.loads(msg)
 
         start_time = time.perf_counter()
+        if data['type'] == 'artifact_analyzer':
+            analyzer = ArtifactAnalyzer(self.database, data['data'])
+            analyzer.analyze()
+        elif data['type'] == 'source_analyzer':
+            analyzer = SourceAnalyzer(self.database, data['data'])
+            analyzer.analyze()
+        else:
+            print('Unknown command type: %s' % data['type'])
 
         try:
-            if data['type'] == 'artifact_analyzer':
-                analyzer = ArtifactAnalyzer(self.database, data['data'])
-                analyzer.analyze()
-            elif data['type'] == 'source_analyzer':
-                analyzer = SourceAnalyzer(self.database, data['data'])
-                analyzer.analyze()
-            else:
-                print('Unknown command type: %s' % data['type'])
-
+            pass
         except Exception as e:
             print('[e] Failed to process (%s)\n' % e)
         else:
