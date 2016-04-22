@@ -52,6 +52,9 @@ class ProjectAnalyzer(AnalyzerBase):
             count = jspairs.get(p1, {})
             count[p2] = pairs[pair]
             jspairs[p1] = count
+            count = jspairs.get(p2, {})
+            count[p1] = pairs[pair]
+            jspairs[p2] = count
 
         data = {
             'pair_occurences': jspairs,
