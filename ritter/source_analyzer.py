@@ -17,7 +17,7 @@ class SourceAnalyzer(AnalyzerBase):
         text = self._get_doc(self.collection, self.id)
         if text is None:
             print(' => Text not found %s' % self.id)
-            return
+            return True
 
         marked_tree = json.loads(text['markedTree'])
 

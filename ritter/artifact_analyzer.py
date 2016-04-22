@@ -20,7 +20,7 @@ class ArtifactAnalyzer(AnalyzerBase):
         artifact = self._get_doc(self.collection, self.id)
         if artifact is None:
             print('=> Artifact not found %s' % self.id)
-            return
+            return True
 
         data = {}
         data.update(self._extract_text(artifact))
