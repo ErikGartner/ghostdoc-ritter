@@ -16,7 +16,7 @@ class ProjectAnalyzer(AnalyzerBase):
         project = self._get_doc(self.collection, self.id)
         if project is None:
             print(' => Project not found %s' % self.id)
-            return
+            return True
 
         data = {}
         data.update(self._analyze_networks(project))
