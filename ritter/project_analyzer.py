@@ -36,8 +36,6 @@ class ProjectAnalyzer(AnalyzerBase):
             marked_tree.extend(json.loads(source['markedTree']))
 
         artifacts = self.db['artifacts'].find({'project': project['_id']})
-        artifacts = iter(artifacts)
-
         ArtifactAnnotator.linkify_artifacts(marked_tree, artifacts)
 
         pairs = NetworkAnalyzer.count_artifacts_pairs(marked_tree)

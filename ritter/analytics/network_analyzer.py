@@ -29,8 +29,9 @@ class NetworkAnalyzer:
         for item in marked_tree:
             if 'text' in item:
                 m = reg.findall(item['text'])
-                c = Counter(m)
-                pairs = list(itertools.combinations(list(c), 2))
+                c = list(Counter(m))
+                c.sort()
+                pairs = list(itertools.combinations(c, 2))
                 counts = Counter(pairs)
                 counter = counter + counts
         return dict(counter)
