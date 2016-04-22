@@ -2,6 +2,7 @@ import json
 
 from .analyzerbase import AnalyzerBase
 from .analytics.network_analyzer import NetworkAnalyzer
+from .dataprocessors.annotators import ArtifactAnnotator
 
 
 class ProjectAnalyzer(AnalyzerBase):
@@ -18,28 +19,26 @@ class ProjectAnalyzer(AnalyzerBase):
             return
 
         data = {}
-        res = self._analyze_networks(project)
-        if res is False:
-            return False
+        data.update(self._analyze_networks(project))
         self._save_analytics(self.collection, data, project['_id'])
         return True
 
     def _analyze_networks(self, project):
+        # This needs to be speeded up since it re-annotates all artifacts again
         print(' => Analyzing network structure')
-        ritterData = self.db['ritterData'].find(
-            {'project': project['_id'],
-             'type': 'source_analytics'})
-        texts = self.db['texts'].find({'project': project['_id']})
-        if ritterData.count() != texts.count():
-            return False
+        sources = self.db['texts'].find({'project': project['_id']})
 
         marked_tree = []
-        for data in ritterData:
-            if 'marked_tree' not in data['data'] or not data['data'][
-                    'marked_tree']['is_linkified']:
+        for source in sources:
+            if 'markedTree' not in source:
                 print('\t\t - Error missing marked_tree data')
-                return False
-            marked_tree.extend(data['data']['marked_tree']['data'])
+                return {}
+            marked_tree.extend(json.loads(source['markedTree']))
+
+        artifacts = self.db['artifacts'].find({'project': project['_id']})
+        artifacts = iter(artifacts)
+
+        ArtifactAnnotator.linkify_artifacts(marked_tree, artifacts)
 
         pairs = NetworkAnalyzer.count_artifacts_pairs(marked_tree)
         centrality = NetworkAnalyzer.calculate_artifacts_centrality(pairs)
