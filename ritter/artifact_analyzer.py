@@ -30,6 +30,7 @@ class ArtifactAnalyzer(AnalyzerBase):
         data.update(self._linkify_artifacts(artifact, data))
 
         self._save_analytics(self.collection, data, artifact['project'])
+        return True
 
     def _determine_gender(self, artifact):
         print(' => Determining gender')

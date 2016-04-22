@@ -21,7 +21,6 @@ class NetworkAnalyzer:
         for pair in pair_counts:
             g.add_edge(pair[0], pair[1], weight=pair_counts[pair])
         com = community.best_partition(g)
-        print(com)
         return com
 
     def count_artifacts_pairs(marked_tree):

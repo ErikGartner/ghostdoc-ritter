@@ -4,7 +4,6 @@ from .analyzerbase import AnalyzerBase
 from .dataprocessors.toc_generator import TocGenerator
 from .dataprocessors.annotators import ArtifactAnnotator
 from .analytics.lang_detector import LangDetector
-from .analytics.network_analyzer import NetworkAnalyzer
 
 
 class SourceAnalyzer(AnalyzerBase):
@@ -26,9 +25,9 @@ class SourceAnalyzer(AnalyzerBase):
         data.update(self._generate_toc(marked_tree))
         data.update(self._linkify_artifacts(marked_tree, text))
         data.update(self._detect_language(text))
-        data.update(self._analyze_networks(data))
 
         self._save_analytics(self.collection, data, text['project'])
+        return True
 
     def _generate_toc(self, marked_tree):
         print(' => Generating table of content')
@@ -46,34 +45,3 @@ class SourceAnalyzer(AnalyzerBase):
     def _detect_language(self, text):
         print(' => Detecing language')
         return {'lang_detector': {'lang': LangDetector.detect(text['text'])}}
-
-    def _analyze_networks(self, data):
-        print(' => Analyzing network structure')
-        if 'marked_tree' not in data:
-            print('\t\t - Error missing marked_tree data')
-            return {}
-
-        if not data['marked_tree'].get('is_linkified', False):
-            print('\t\t - Error marked_tree not annotated')
-            return {}
-
-        marked_tree = data['marked_tree']['data']
-        pairs = NetworkAnalyzer.count_artifacts_pairs(marked_tree)
-        centrality = NetworkAnalyzer.calculate_artifacts_centrality(pairs)
-        communities = NetworkAnalyzer.determine_communities(pairs)
-
-        # Mongo can't handle tuple for keys
-        jspairs = {}
-        for pair in pairs:
-            p1 = pair[0]
-            p2 = pair[1]
-            count = jspairs.get(p1, {})
-            count[p2] = pairs[pair]
-            jspairs[p1] = count
-
-        data = {
-            'pair_occurences': jspairs,
-            'centrality': centrality,
-            'communities': communities,
-        }
-        return {'network_analytics': data}

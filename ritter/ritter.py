@@ -7,6 +7,7 @@ from pymongo import MongoClient
 
 from .artifact_analyzer import ArtifactAnalyzer
 from .source_analyzer import SourceAnalyzer
+from .project_analyzer import ProjectAnalyzer
 
 
 class Ritter:
@@ -32,24 +33,29 @@ class Ritter:
         data = json.loads(msg)
 
         start_time = time.perf_counter()
-        if data['type'] == 'artifact_analyzer':
-            analyzer = ArtifactAnalyzer(self.database, data['data'])
-            analyzer.analyze()
-        elif data['type'] == 'source_analyzer':
-            analyzer = SourceAnalyzer(self.database, data['data'])
-            analyzer.analyze()
-        else:
-            print('Unknown command type: %s' % data['type'])
-
+        ack = True
         try:
-            pass
+            if data['type'] == 'artifact_analyzer':
+                analyzer = ArtifactAnalyzer(self.database, data['data'])
+                ack = analyzer.analyze()
+            elif data['type'] == 'source_analyzer':
+                analyzer = SourceAnalyzer(self.database, data['data'])
+                ack = analyzer.analyze()
+            elif data['type'] == 'project_analyzer':
+                analyzer = ProjectAnalyzer(self.database, data['data'])
+                ack = analyzer.analyze()
+            else:
+                raise Exception('Unknown command type: %s' % data['type'])
         except Exception as e:
             print('[e] Failed to process (%s)\n' % e)
         else:
             print('[x] Processed cmd in %ss\n' %
                   (time.perf_counter() - start_time))
         finally:
-            ch.basic_ack(delivery_tag=method.delivery_tag)
+            if ack:
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+            else:
+                ch.basic_nack(delivery_tag=method.delivery_tag)
 
     def read_config(self):
         config = {
