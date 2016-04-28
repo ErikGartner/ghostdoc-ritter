@@ -18,6 +18,9 @@
 - Gender detection (from artifact name)
 - Extraction of relevant paragraphs
 - Extraction of user defined  gems (facts about artifact)
+- Centrality of artifacts
+- Community detection of artifacts
+- Friend score between artifacts
 
 ## Installation
 This project is optimized for running on Dokku but can run elsewhere as well. *Ritter* requires Python >= 3.4, a Mongo database and a RabbitMQ broker. Running multiple instances for the same *Ghostdoc* instance is possible and preferred.
