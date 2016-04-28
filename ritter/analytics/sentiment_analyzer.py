@@ -9,7 +9,7 @@ class SentimentAnalyzer():
 
     _sentimental = sentimental.Sentimental(max_ngrams=2)
     path = sentimental.Sentimental.get_datafolder()
-    _sentimental.train([path + '/sv/lexicon', path + '/sv/ruhburg'])
+    _sentimental.train([path + '/sv/ruhburg'])
 
     def calculate_friend_scores(marked_tree):
         reg = re.compile('\(([\w]+) \\\"GHOSTDOC-TOKEN\\\"\)')
