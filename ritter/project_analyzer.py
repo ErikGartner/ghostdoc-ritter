@@ -2,6 +2,7 @@ import json
 
 from .analyzerbase import AnalyzerBase
 from .analytics.network_analyzer import NetworkAnalyzer
+from .analytics.sentiment_analyzer import SentimentAnalyzer
 from .dataprocessors.annotators import ArtifactAnnotator
 
 
@@ -18,16 +19,9 @@ class ProjectAnalyzer(AnalyzerBase):
             print(' => Project not found %s' % self.id)
             return True
 
-        data = {}
-        data.update(self._analyze_networks(project))
-        self._save_analytics(self.collection, data, project['_id'])
-        return True
-
-    def _analyze_networks(self, project):
-        # This needs to be speeded up since it re-annotates all artifacts again
-        print(' => Analyzing network structure')
         sources = self.db['texts'].find({'project': project['_id']})
 
+        # Linkify marked_tree
         marked_tree = []
         for source in sources:
             if 'markedTree' not in source:
@@ -38,10 +32,40 @@ class ProjectAnalyzer(AnalyzerBase):
         artifacts = self.db['artifacts'].find({'project': project['_id']})
         ArtifactAnnotator.linkify_artifacts(marked_tree, artifacts)
 
+        data = {}
+        data.update(self._analyze_networks(marked_tree))
+        data.update(self._analyze_relations(marked_tree))
+        self._save_analytics(self.collection, data, project['_id'])
+        return True
+
+    def _analyze_networks(self, marked_tree):
+        print(' => Analyzing network structure')
+
         pairs = NetworkAnalyzer.count_artifacts_pairs(marked_tree)
         centrality = NetworkAnalyzer.calculate_artifacts_centrality(pairs)
         communities = NetworkAnalyzer.determine_communities(pairs)
 
+        jspairs = ProjectAnalyzer._pairs_to_jspairs(pairs)
+
+        data = {
+            'pair_occurences': jspairs,
+            'centrality': centrality,
+            'communities': communities,
+        }
+        return {'network_analytics': data}
+
+    def _analyze_relations(self, marked_tree):
+        print(' => Analyzing friend scores')
+
+        pairs = SentimentAnalyzer.calculate_friend_scores(marked_tree)
+        jspairs = ProjectAnalyzer._pairs_to_jspairs(pairs)
+
+        data = {
+            'friend_scores': jspairs,
+        }
+        return {'relations_analytics': data}
+
+    def _pairs_to_jspairs(pairs):
         # Mongo can't handle tuple for keys
         jspairs = {}
         for pair in pairs:
@@ -53,10 +77,4 @@ class ProjectAnalyzer(AnalyzerBase):
             count = jspairs.get(p2, {})
             count[p1] = pairs[pair]
             jspairs[p2] = count
-
-        data = {
-            'pair_occurences': jspairs,
-            'centrality': centrality,
-            'communities': communities,
-        }
-        return {'network_analytics': data}
+        return jspairs
