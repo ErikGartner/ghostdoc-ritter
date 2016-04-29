@@ -29,7 +29,7 @@ class SentimentAnalyzer():
                         s[1] = s[1] + 1
                     scores[pair] = s
 
-        return {_id: (vals[0] - vals[1]) * math.exp(vals[0] / (vals[0] + vals[1])) for _id, vals in scores.items()}
+        return {_id: (vals[0] - vals[1]) * math.exp(vals[0] / (vals[0] + vals[1] + 1)) for _id, vals in scores.items()}
 
     def sentiment(text):
         pos = SentimentAnalyzer._sentimental.sentiment(text)['positive']
