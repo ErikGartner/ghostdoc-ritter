@@ -1,4 +1,4 @@
-import re
+import re, math
 from collections import Counter
 import itertools
 
@@ -22,9 +22,14 @@ class SentimentAnalyzer():
 
                 senti = SentimentAnalyzer.sentiment(item['text'])
                 for pair in pairs:
-                    scores[pair] = scores.get(pair, 0) + senti
+                    s = scores.get(pair, [0, 0])
+                    if senti == 1:
+                        s[0] = s[0] + 1
+                    elif senti == -1:
+                        s[1] = s[1] + 1
+                    scores[pair] = s
 
-        return dict(scores)
+        return {_id: (vals[0] - vals[1]) * math.exp(vals[0] / (vals[0] + vals[1])) for _id, vals in scores.items()}
 
     def sentiment(text):
         pos = SentimentAnalyzer._sentimental.sentiment(text)['positive']
