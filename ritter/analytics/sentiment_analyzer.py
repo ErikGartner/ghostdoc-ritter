@@ -29,13 +29,13 @@ class SentimentAnalyzer():
                         s[1] = s[1] + 1
                     scores[pair] = s
 
-        return {_id: (vals[0] - vals[1]) * math.exp(vals[0] / (vals[0] + vals[1] + 1)) for _id, vals in scores.items()}
+        return {_id: (vals[0] - vals[1]) * math.exp(max(vals) / (vals[0] + vals[1] + 1)) for _id, vals in scores.items()}
 
     def sentiment(text):
-        pos = SentimentAnalyzer._sentimental.sentiment(text)['positive']
-        if pos < 0.48:
-            return -1
-        elif pos > 0.52:
+        label = max(SentimentAnalyzer._sentimental.sentiment(text))
+        if label == 'positive':
             return 1
+        elif label == 'negative':
+            return -1
         else:
             return 0
