@@ -2,7 +2,7 @@ import re, math
 from collections import Counter
 import itertools
 
-from sentimental import Sentimetanl, get_datafolder
+from sentimental import Sentimental, get_datafolder
 
 
 class SentimentAnalyzer():
