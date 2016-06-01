@@ -7,7 +7,7 @@ from sentimental import sentimental
 
 class SentimentAnalyzer():
 
-    _sentimental = sentimental.Sentimental(max_ngrams=2)
+    _sentimental = sentimental.Sentimental(max_ngrams=2, undersample=True)
     path = sentimental.Sentimental.get_datafolder()
     _sentimental.train([path + '/sv/ruhburg'])
 
