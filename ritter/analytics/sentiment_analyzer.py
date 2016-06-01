@@ -2,13 +2,13 @@ import re, math
 from collections import Counter
 import itertools
 
-from sentimental import Sentimental, get_datafolder
+from sentimental import Sentimental, get_data_path
 
 
 class SentimentAnalyzer():
 
     _sentimental = Sentimental(max_ngrams=2, undersample=True)
-    _sentimental.train([get_datafolder() + '/sv/ruhburg'])
+    _sentimental.train([get_data_path() + '/sv/ruhburg'])
 
     def calculate_friend_scores(marked_tree):
         reg = re.compile('\(([\w]+) \\\"GHOSTDOC-TOKEN\\\"\)')
