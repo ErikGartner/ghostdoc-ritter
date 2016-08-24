@@ -1,15 +1,14 @@
-import re
+import re, math
 from collections import Counter
 import itertools
 
-from sentimental import sentimental
+from sentimental import Sentimental, get_data_path
 
 
 class SentimentAnalyzer():
 
-    _sentimental = sentimental.Sentimental(max_ngrams=2)
-    path = sentimental.Sentimental.get_datafolder()
-    _sentimental.train([path + '/sv/ruhburg'])
+    _sentimental = Sentimental(max_ngrams=2, undersample=True)
+    _sentimental.train([get_data_path() + '/sv/ruhburg'])
 
     def calculate_friend_scores(marked_tree):
         reg = re.compile('\(([\w]+) \\\"GHOSTDOC-TOKEN\\\"\)')
@@ -22,15 +21,20 @@ class SentimentAnalyzer():
 
                 senti = SentimentAnalyzer.sentiment(item['text'])
                 for pair in pairs:
-                    scores[pair] = scores.get(pair, 0) + senti
+                    s = scores.get(pair, [0, 0])
+                    if senti == 1:
+                        s[0] = s[0] + 1
+                    elif senti == -1:
+                        s[1] = s[1] + 1
+                    scores[pair] = s
 
-        return dict(scores)
+        return {_id: (vals[0] - vals[1]) * math.exp(max(vals) / (vals[0] + vals[1] + 1)) for _id, vals in scores.items()}
 
     def sentiment(text):
-        pos = SentimentAnalyzer._sentimental.sentiment(text)['positive']
-        if pos < 0.48:
-            return -1
-        elif pos > 0.52:
+        label = max(SentimentAnalyzer._sentimental.sentiment(text))
+        if label == 'positive':
             return 1
+        elif label == 'negative':
+            return -1
         else:
             return 0
