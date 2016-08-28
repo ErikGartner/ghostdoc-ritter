@@ -21,6 +21,7 @@
 - Centrality of artifacts
 - Community detection of artifacts
 - Friend score between artifacts
+- Find Trello cards mentioning artifacts
 
 ## Installation
 This project is optimized for running on Dokku but can run elsewhere as well. *Ritter* requires Python >= 3.4, a Mongo database and a RabbitMQ broker. Running multiple instances for the same *Ghostdoc* instance is possible and preferred.
@@ -28,7 +29,10 @@ This project is optimized for running on Dokku but can run elsewhere as well. *R
 Dependencies can be installed using pip or setuptools.
 
 The following environment variables should be set and should be same as the ones set for *Ghostdoc*.
-```
+```bash
 MONGO_URL
 RABBITMQ_URL
+
+# optionals
+RITTER_TRELLO_KEY
 ```

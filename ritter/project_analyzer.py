@@ -4,6 +4,7 @@ from .analyzerbase import AnalyzerBase
 from .analytics.network_analyzer import NetworkAnalyzer
 from .analytics.sentiment_analyzer import SentimentAnalyzer
 from .dataprocessors.annotators import ArtifactAnnotator
+from .analytics.trello_source import TrelloSource
 
 
 class ProjectAnalyzer(AnalyzerBase):
@@ -29,12 +30,13 @@ class ProjectAnalyzer(AnalyzerBase):
                 return {}
             marked_tree.extend(json.loads(source['markedTree']))
 
-        artifacts = self.db['artifacts'].find({'project': project['_id']})
+        artifacts = list(self.db['artifacts'].find({'project': project['_id']}))
         ArtifactAnnotator.linkify_artifacts(marked_tree, artifacts)
 
         data = {}
         data.update(self._analyze_networks(marked_tree))
         data.update(self._analyze_relations(marked_tree))
+        data.update(self._analyze_trello(project, artifacts))
         self._save_analytics(self.collection, data, project['_id'])
         return True
 
@@ -78,3 +80,10 @@ class ProjectAnalyzer(AnalyzerBase):
             count[p1] = pairs[pair]
             jspairs[p2] = count
         return jspairs
+
+    def _analyze_trello(self, project, artifacts):
+        print(' => Refreshing Trello source')
+        res = TrelloSource.refresh_source(project, artifacts)
+        return {
+            'trello': res
+        }
