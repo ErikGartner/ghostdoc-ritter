@@ -57,14 +57,11 @@ class ProjectAnalyzer(AnalyzerBase):
         return {'network_analytics': data}
 
     def _analyze_relations(self, marked_tree):
-        print(' => Analyzing friend scores')
+        print(' => Analyzing sentiment scores')
 
-        pairs = SentimentAnalyzer.calculate_friend_scores(marked_tree)
-        jspairs = ProjectAnalyzer._pairs_to_jspairs(pairs)
+        data = SentimentAnalyzer.calculate_scores(marked_tree)
+        data['friend_scores'] = ProjectAnalyzer._pairs_to_jspairs(data['friend_scores'])
 
-        data = {
-            'friend_scores': jspairs,
-        }
         return {'relations_analytics': data}
 
     def _pairs_to_jspairs(pairs):
