@@ -18,6 +18,9 @@ class TrelloSource:
             return
 
         cards = TrelloSource._get_all_cards(api_key, user_key, organization_id)
+        if cards == False:
+            return {'artifact_cards': []}
+
         artifact_cards = TrelloSource._match_with_artifacts(cards, artifacts)
         return {
             'artifact_cards': artifact_cards
