@@ -30,7 +30,8 @@ class ArtifactExtractor:
                 continue
             if mt[i]['type'] == mt[i + 1]['type'] == 'heading':
                 mt[i] = None
-            elif mt[i]['type'] == 'list_item_start' and mt[i + 1]['type'] == 'list_item_end':
+            elif (mt[i]['type'].endswith('_item_start') and
+                  mt[i + 1]['type'] == 'list_item_end'):
                 mt[i] = None
                 mt[i + 1] = None
         if len(mt) > 0 and mt[-1].get('type') == 'heading':
