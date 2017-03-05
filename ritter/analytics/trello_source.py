@@ -4,7 +4,7 @@ import os
 
 import requests
 
-from ..dataprocessors.artifact_extractor import ArtifactExtractor
+from ..dataprocessors.artifact_extractor import ParseTreeFilterer
 
 
 class TrelloSource:
@@ -41,7 +41,8 @@ class TrelloSource:
     def _match_with_artifacts(cards, artifacts):
         artifact_cards = {}
         for artifact in artifacts:
-            reg = ArtifactExtractor._paragraph_reg(artifact['tokens'])
+            parser = ParseTreeFilterer(artifact['tokens'])
+            reg = parser.artifact_reg
             matches = [c for c in cards if (reg.search(c['name']) or
                                             reg.search(c['desc']))]
             artifact_cards[artifact['_id']] = matches

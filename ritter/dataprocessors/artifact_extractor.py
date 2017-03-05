@@ -1,55 +1,110 @@
 import re
+import pprint
+import copy
 
 
 class ArtifactExtractor:
+
     def extract(marked_tree, artifact):
-        data = []
-        reg = ArtifactExtractor._paragraph_reg(artifact['tokens'])
-        marked_tree = [i
-                       for i in marked_tree
-                       if ArtifactExtractor._filter_text_items(i, reg)]
+        filterer = ParseTreeFilterer(artifact['tokens'])
+        return filterer.filter(marked_tree)
 
-        marked_tree = ArtifactExtractor._filter_headers(marked_tree)
-        marked_tree = ArtifactExtractor._rec_filter_lists(marked_tree, 0)
-        return marked_tree
 
-    def _paragraph_reg(tokens):
+class ParseTreeFilterer:
+
+    def __init__(self, tokens):
         reg = r'(\b' + r'|\b'.join(tokens) + r')'
-        return re.compile(reg, re.IGNORECASE)
+        self.artifact_reg = re.compile(reg, re.IGNORECASE)
 
-    def _filter_text_items(item, reg):
-        if 'text' in item and item['type'] != 'heading':
-            return reg.search(item['text']) is not None
-        elif item['type'] == 'space':
-            return False
-        else:
-            return True
+    def filter(self, mt):
+        mt = copy.copy(mt)
+        self._filter(mt, 0, len(mt) - 1)
+        return [item for item in mt if item is not None]
 
-    def _filter_headers(mt):
-        for i in range(len(mt) - 1):
-            if mt[i] is None:
+    def _filter(self, mt, pos, end_pos):
+        """
+        Returns False is all is None in [pos, end_pos] else True
+        """
+        start_pos = pos
+        while pos <= end_pos:
+            item = mt[pos]
+
+            if item is None:
+                pos += 1
                 continue
-            if mt[i]['type'] == mt[i + 1]['type'] == 'heading':
+
+            if item['type'] == 'heading':
+                pos = self._filter_heading(mt, pos)
+
+            elif item['type'] == 'space':
                 mt[i] = None
-        if len(mt) > 0 and mt[-1].get('type') == 'heading':
-            mt[-1] = None
-        return [i for i in mt if i != None]
+                pos += 1
 
-    def _rec_filter_lists(mt, i):
-        if i > len(mt) - 1:
-            return mt
+            elif item['type'] == 'paragraph':
+                pos = self._filter_text(mt, pos)
 
-        if (mt[i]['type'].endswith('_item_start') and
-            mt[i + 1]['type'] == 'list_item_end'):
-            del mt[i]
-            del mt[i + 1]
+            elif item['type'] == 'text':
+                pos = self._filter_text(mt, pos)
 
-        elif (mt[i]['type'].endswith('list_start') and
-            mt[i + 1]['type'] == 'list_end'):
-            del mt[i]
-            del mt[i + 1]
+            elif item['type'] == 'list_start':
+                pos = self._filter_list(mt, pos)
 
+            else:
+                print("Unexpected type: %s" % mt[pos])
+                pos += 1
+
+        for p in range(start_pos, end_pos + 1):
+            if mt[p] is not None:
+                return True
         else:
-            i += 1
+            return False
 
-        return ArtifactExtractor._rec_filter_lists(mt, i)
+    def _artifact_found(self, text):
+        return self.artifact_reg.search(text) is not None
+
+    def _filter_heading(self, mt, pos):
+        if self._artifact_found(mt[pos]['text']):
+            # Artifact was found in heading, keep heading regardless of if
+            # there exists any references in text under
+            return pos + 1
+
+        # Find end of this section
+        end_pos = pos
+        while(end_pos + 1 < len(mt) and
+              mt[end_pos + 1]['type'] != 'heading'):
+            end_pos += 1
+
+        if end_pos == pos:
+            # Remove a dangling header
+            mt[pos] = None
+            return end_pos
+
+        empty_section = not self._filter(mt, pos + 1, end_pos)
+        if empty_section:
+            mt[pos] = None
+        return end_pos + 1
+
+    def _filter_text(self, mt, pos):
+        if not self._artifact_found(mt[pos]['text']):
+            mt[pos] = None
+        return pos + 1
+
+    def _filter_list(self, mt, pos):
+        start_pos = pos
+        list_empty = True
+        while pos < len(mt):
+            if mt[pos]['type'] == 'text':
+                if not self._artifact_found(mt[pos]['text']):
+                    pos += 1
+                else:
+                    list_empty = False
+
+            elif mt[pos]['type'] == 'list_end':
+                if list_empty:
+                    for p in range(start_pos, pos + 1):
+                        mt[p] = None
+                return pos + 1
+
+            pos += 1
+
+        return pos
