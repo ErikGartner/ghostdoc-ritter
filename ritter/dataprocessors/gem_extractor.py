@@ -107,6 +107,8 @@ class GemExtractor:
                     results.add(new_item)
                     results.remove(r)
                     return results
+                else:
+                    return results
 
         results.add(new_item)
         return results
