@@ -70,12 +70,15 @@ class ArtifactAnalyzer(AnalyzerBase):
             print('\t\t - Error missing marked_tree data')
             return {}
 
+        artifacts = iter(self.db['artifacts'].find(
+                            {'project': artifact['project']}))
+
         tree = []
         for d in data['marked_tree']['data']:
             tree.extend(d['tree'])
 
         gems = iter(self.db['gems'].find({'project': artifact['project']}))
-        gem_data = GemExtractor.extract(tree, artifact, gems)
+        gem_data = GemExtractor.extract(tree, artifact, gems, artifacts)
 
         data = {'gems': {'data': gem_data}}
         return data
