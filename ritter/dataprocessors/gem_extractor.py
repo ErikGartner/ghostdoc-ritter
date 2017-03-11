@@ -1,5 +1,7 @@
 import re
 
+import editdistance
+
 
 class GemExtractor:
 
@@ -30,7 +32,7 @@ class GemExtractor:
         return data
 
     def extract_gem(sentences, gem, artifact, artifacts):
-        results = []
+        results = set()
         if gem is None:
             return None
 
@@ -39,11 +41,11 @@ class GemExtractor:
             reg_capture = GemExtractor._capture_reg(pattern)
             for sentence in sentences:
                 match = reg_capture.findall(sentence)
-                if len(match) != 0:
-                    results.extend(match)
+                for m in match:
+                    results = GemExtractor._merge_duplicates(results, m.strip())
 
         if len(results) > 0:
-            return {'name': gem['name'], 'result': results}
+            return {'name': gem['name'], 'result': sorted(list(results))}
         else:
             return None
 
@@ -73,3 +75,38 @@ class GemExtractor:
                             GemExtractor._no_capture_token_reg(other_tokens))
 
         return pt
+
+    def _merge_duplicates(results, new_item):
+        try:
+            # check for int
+            i = int(new_item)
+            results.add(i)
+            return results
+        except ValueError:
+            pass
+
+        try:
+            # check for float
+            f = float(new_item)
+            results.add(f)
+            return results
+        except ValueError:
+            pass
+
+        if new_item in results:
+            # discard perfect duplicates
+            return results
+
+        # Save capitalized version of near matches.
+        for r in results:
+            s1 = r.lower()
+            s2 = new_item.lower()
+            dist = editdistance.eval(s1, s2)
+            if dist <= 2 and dist / min(len(s1), len(s2)) <= 0.20:
+                if s2 != new_item:
+                    results.add(new_item)
+                    results.remove(r)
+                    return results
+
+        results.add(new_item)
+        return results

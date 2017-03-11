@@ -89,5 +89,6 @@ setup(
         'requests==2.9.1',
         'six==1.10.0',
         'beautifulsoup4==4.4.1',
+        'editdistance==0.3.1',
     ]
 )
