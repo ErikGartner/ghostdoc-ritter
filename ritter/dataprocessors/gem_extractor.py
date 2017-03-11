@@ -102,7 +102,7 @@ class GemExtractor:
             s1 = r.lower()
             s2 = new_item.lower()
             dist = editdistance.eval(s1, s2)
-            if dist <= 2 and dist / min(len(s1), len(s2)) <= 0.20:
+            if s1 == s2 or dist <= 2 and dist / min(len(s1), len(s2)) <= 0.20:
                 if s2 != new_item:
                     results.add(new_item)
                     results.remove(r)
