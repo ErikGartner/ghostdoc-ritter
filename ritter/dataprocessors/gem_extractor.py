@@ -67,7 +67,7 @@ class GemExtractor:
         # GHMACRO_OTHER_ARTIFACT
         if GemExtractor.GHMACRO_OTHER_ARTIFACT in pattern:
             artifacts = list(artifacts)
-            other_tokens = [a['tokens'] for a in artifacts]
+            other_tokens = [a['tokens'] for a in artifacts if a['_id'] != artifact['_id']]
             other_tokens = [item for subl in other_tokens for item in subl]
             pt = pt.replace(GemExtractor.GHMACRO_OTHER_ARTIFACT,
                             GemExtractor._no_capture_token_reg(other_tokens))
