@@ -42,7 +42,14 @@ class GemExtractor:
             for sentence in sentences:
                 match = reg_capture.findall(sentence)
                 for m in match:
-                    results = GemExtractor._merge_duplicates(results, m.strip())
+                    if type(m) is str:
+                        results = GemExtractor._merge_duplicates(results,
+                                                                 m.strip())
+                    elif type(m) is tuple:
+                        # if the pattern contains multiple groups
+                        for k in m:
+                            results = GemExtractor._merge_duplicates(results,
+                                                                     k.strip())
 
         if len(results) > 0:
             return {'name': gem['name'], 'result': sorted(list(results)),
