@@ -45,7 +45,8 @@ class GemExtractor:
                     results = GemExtractor._merge_duplicates(results, m.strip())
 
         if len(results) > 0:
-            return {'name': gem['name'], 'result': sorted(list(results))}
+            return {'name': gem['name'], 'result': sorted(list(results)),
+                    '_id': gem['_id']}
         else:
             return None
 
