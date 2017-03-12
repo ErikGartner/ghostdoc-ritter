@@ -94,6 +94,10 @@ class GemExtractor:
         except ValueError:
             pass
 
+        if len(new_item) == 0:
+            # discard empty items
+            return results
+
         if new_item in results:
             # discard perfect duplicates
             return results
