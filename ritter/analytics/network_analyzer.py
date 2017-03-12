@@ -17,6 +17,9 @@ class NetworkAnalyzer:
         return pr
 
     def determine_communities(pair_counts):
+        if len(pair_counts) == 0:
+            return {}
+
         g = nx.Graph()
         for pair in pair_counts:
             g.add_edge(pair[0], pair[1], weight=pair_counts[pair])
